@@ -12,15 +12,18 @@ interface DotGridCalendarProps {
 export default function DotGridCalendar({ entryMap, onDayClick, loading }: DotGridCalendarProps) {
   const [hoveredDate, setHoveredDate] = useState<string | null>(null)
 
-  // Calculate year range
-  const yearStart = new Date(2026, 0, 1)
-  const yearEnd = new Date(2026, 11, 31)
+  // Calculate year range - dynamically use current year
   const today = new Date()
   today.setHours(0, 0, 0, 0)
+  const currentYear = today.getFullYear()
+  const yearStart = new Date(currentYear, 0, 1)
+  const yearEnd = new Date(currentYear, 11, 31)
 
   // Calculate days remaining
   const daysRemaining = differenceInDays(yearEnd, today)
-  const daysElapsed = 365 - daysRemaining
+  // Calculate total days in current year (handles leap years)
+  const totalDaysInYear = differenceInDays(yearEnd, yearStart) + 1
+  const daysElapsed = totalDaysInYear - daysRemaining
 
   // Generate all days in the year
   const allDays = []
@@ -40,7 +43,7 @@ export default function DotGridCalendar({ entryMap, onDayClick, loading }: DotGr
       <div className="rounded-3xl bg-gradient-to-b from-accent to-card border border-border/50 p-4 backdrop-blur-md">
         <div className="space-y-1 text-center">
           <div className="text-3xl font-light tracking-tight">{daysRemaining}</div>
-          <p className="text-xs text-muted-foreground">days left in 2026</p>
+          <p className="text-xs text-muted-foreground">days left in {currentYear}</p>
           {todayEntry && (
             <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
               <span className="inline-block w-3 h-3 rounded-full bg-primary/30"></span>
@@ -79,7 +82,7 @@ export default function DotGridCalendar({ entryMap, onDayClick, loading }: DotGr
                   onMouseLeave={() => setHoveredDate(null)}
                   disabled={!isPastOrToday}
                   className={`
-                    w-full aspect-square rounded-full transition-all duration-200
+                    w-full aspect-square rounded-full
                     flex items-center justify-center relative
                     ${isToday ? "ring-1 ring-primary" : ""}
                     ${
@@ -94,7 +97,7 @@ export default function DotGridCalendar({ entryMap, onDayClick, loading }: DotGr
                 >
                   {/* Dot visualization */}
                   <div
-                    className={`w-1 h-1 rounded-full transition-all ${
+                    className={`w-1 h-1 rounded-full ${
                       hasEntry ? "bg-primary-foreground scale-100" : "bg-foreground/20 scale-75"
                     }`}
                   ></div>
@@ -115,7 +118,7 @@ export default function DotGridCalendar({ entryMap, onDayClick, loading }: DotGr
             <div className="text-[10px]">entries</div>
           </div>
           <div className="text-right">
-            <div className="font-medium">{Math.round((entryMap.size / 365) * 100)}%</div>
+            <div className="font-medium">{Math.round((entryMap.size / totalDaysInYear) * 100)}%</div>
             <div className="text-[10px]">complete</div>
           </div>
         </div>

@@ -29,7 +29,9 @@ export function useTheme() {
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light"
+    // Update state first, then apply theme immediately
     setTheme(newTheme)
+    // Apply theme synchronously for instant class change (CSS handles smooth transition)
     applyTheme(newTheme)
   }
 

@@ -7,8 +7,11 @@ interface Entry {
 }
 
 export default function CountdownCalendar({ entries }: { entries: Entry[] }) {
-  const startOfYear = new Date("2026-01-01")
-  const endOfYear = new Date("2026-12-31")
+  // Get current year dynamically
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const startOfYear = new Date(currentYear, 0, 1)
+  const endOfYear = new Date(currentYear, 11, 31)
   const totalDays = Math.floor((endOfYear.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)) + 1
 
   const completedDates = new Set(entries.filter((e) => e.is_completed).map((e) => e.entry_date))

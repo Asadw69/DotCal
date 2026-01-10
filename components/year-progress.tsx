@@ -9,13 +9,18 @@ interface Entry {
 }
 
 export default function YearProgress({ entries }: { entries: Entry[] }) {
-  const totalDays = 366 // 2026 is a leap year
+  // Get current year dynamically
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const startOfYear = new Date(currentYear, 0, 1)
+  const endOfYear = new Date(currentYear, 11, 31)
+  
+  // Calculate total days in year (handles leap years automatically)
+  const totalDays = Math.floor((endOfYear.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)) + 1
   const loggedDays = entries.length
   const percentage = Math.round((loggedDays / totalDays) * 100)
 
-  const startOfYear = new Date("2026-01-01")
-  const endOfYear = new Date("2026-12-31")
-  const daysLeft = Math.ceil((endOfYear.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+  const daysLeft = Math.ceil((endOfYear.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
   const daysElapsed = totalDays - daysLeft
 
   return (
@@ -24,7 +29,7 @@ export default function YearProgress({ entries }: { entries: Entry[] }) {
       <div className="rounded-lg border border-border bg-muted/30 p-4">
         <div className="text-center">
           <div className="text-3xl font-light tracking-tight mb-1">{daysLeft}</div>
-          <div className="text-xs text-muted-foreground">days remaining in 2026</div>
+          <div className="text-xs text-muted-foreground">days remaining in {currentYear}</div>
         </div>
       </div>
 

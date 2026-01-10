@@ -61,6 +61,20 @@ export default function EntryModal({
     })
   }
 
+  const getPlaceholder = () => {
+    if (!selectedDate) return "What was on your mind?"
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const selected = new Date(selectedDate)
+    selected.setHours(0, 0, 0, 0)
+    
+    if (selected.getTime() === today.getTime()) {
+      return "What was on your mind today?"
+    } else {
+      return "What you forgot to add?"
+    }
+  }
+
   if (!isOpen) return null
 
   return (
@@ -84,7 +98,7 @@ export default function EntryModal({
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="What was on your mind today?"
+            placeholder={getPlaceholder()}
             className="w-full min-h-48 p-4 rounded-2xl border border-border/30 bg-card/50 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none transition-all duration-200"
           />
 

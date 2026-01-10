@@ -46,7 +46,7 @@ export default function Home() {
   const entryMap = new Map(entries.map((e) => [e.entry_date, e]))
 
   return (
-    <main className="min-h-screen bg-background text-foreground transition-colors duration-200">
+    <main className="min-h-screen bg-background text-foreground">
       <div className="flex items-center justify-center min-h-screen p-2">
         <div className="w-full max-w-4xl space-y-2">
           <div className="flex justify-end">

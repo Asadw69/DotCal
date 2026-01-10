@@ -13,20 +13,24 @@ export async function GET() {
 
     if (error) throw error
 
+    // Get current year dynamically
+    const now = new Date()
+    const currentYear = now.getFullYear()
+    const startOfYear = new Date(currentYear, 0, 1)
+    const endOfYear = new Date(currentYear, 11, 31)
+
     // Calculate countdown
-    const daysLeft = Math.ceil((new Date("2026-12-31").getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    const daysLeft = Math.ceil((endOfYear.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 
     // Note: This endpoint returns sample data. For iOS widgets to work with localStorage data,
     // you need to configure the widget using WidgetKit and have it fetch this endpoint
     // which you can populate by calling the /api/export endpoint from your device
 
     // Get today's entry
-    const todayStr = new Date().toISOString().split("T")[0]
+    const todayStr = now.toISOString().split("T")[0]
     const todayEntry = entries?.find((e) => e.entry_date === todayStr)
 
-    // Calculate year progress visualization data
-    const startOfYear = new Date("2026-01-01")
-    const endOfYear = new Date("2026-12-31")
+    // Calculate year progress visualization data (handles leap years)
     const totalDays = Math.floor((endOfYear.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)) + 1
 
     const completedDates = new Set(entries?.filter((e) => e.is_completed).map((e) => e.entry_date) || [])

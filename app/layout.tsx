@@ -11,7 +11,7 @@ const _geistMono = V0_Font_Geist_Mono({ subsets: ['latin'], weight: ["100","200"
 
 export const metadata: Metadata = {
   title: "DotCal | Journal & Countdown",
-  description: "Minimalist journal app with yearly countdown calendar. Track your memories and stay motivated.",
+  description: "Journal app with yearly countdown calendar.",
   generator: "v0.app",
   manifest: "/manifest.json",
   appleWebApp: {
