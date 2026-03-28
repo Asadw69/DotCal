@@ -35,7 +35,7 @@ export async function GET(request: Request) {
     const pct = Math.round((entryCount / total) * 100);
 
     // ─── iOS Lockscreen safe zones (percentage-based) ─────────────────────
-    const topSafe = Math.round(H * 0.18);   // clock + date + status bar
+    const topSafe = Math.round(H * 0.23);   // clock + date + status bar
     const bottomSafe = Math.round(H * 0.10);   // flashlight / camera / home-bar
     const usableH = H - topSafe - bottomSafe;
 
@@ -51,7 +51,7 @@ export async function GET(request: Request) {
     const gapCards = u(10);  // gap between the three cards
 
     // ─── Dot grid dimensions (14 cols, ~15% smaller than app) ────────────
-    const COLS = 15;
+    const COLS = 16;
     const dotGap = u(3);
     // dot size computed to exactly fill card width
     const dotSize = Math.floor((cardW - cardPad * 2 - dotGap * (COLS - 1)) / COLS);
