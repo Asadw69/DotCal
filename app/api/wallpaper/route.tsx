@@ -1,108 +1,141 @@
 import { ImageResponse } from 'next/og';
 import React from 'react';
+import fs from 'fs';
+import path from 'path';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-
-    // Params
     const width = parseInt(searchParams.get('width') || '1179', 10);
     const height = parseInt(searchParams.get('height') || '2556', 10);
-    const top = parseInt(searchParams.get('top') || '240', 10);
-    const bottom = parseInt(searchParams.get('bottom') || '200', 10);
+    const topSafe = parseInt(searchParams.get('top') || '240', 10);
+    const bottomSafe = parseInt(searchParams.get('bottom') || '200', 10);
     const dataString = searchParams.get('data') || '';
-    const showPreview = searchParams.get('preview') === 'true';
 
-    // Data generation (52 weeks * 7 days)
-    const days = [];
-    if (dataString && dataString.length >= 364) {
-      for (let i = 0; i < 364; i++) {
-        days.push(parseInt(dataString[i] || '0', 10));
-      }
-    } else {
-      // Demo data
-      for (let i = 0; i < 364; i++) {
-        const r = Math.random();
-        days.push(r > 0.8 ? 3 : r > 0.6 ? 2 : r > 0.4 ? 1 : 0);
-      }
-    }
+    const fontsDir = path.join(process.cwd(), 'public', 'fonts');
+    const geistMono300 = fs.readFileSync(path.join(fontsDir, 'GeistMono-Light.ttf'));
+    const geistMono400 = fs.readFileSync(path.join(fontsDir, 'GeistMono-Regular.ttf'));
+    const geistMono500 = fs.readFileSync(path.join(fontsDir, 'GeistMono-Medium.ttf'));
 
-    const weeks = [];
-    for (let i = 0; i < 52; i++) {
-      weeks.push(days.slice(i * 7, i * 7 + 7));
-    }
+    const now = new Date();
+    // Use fixed offset processing to prevent timezone matching errors
+    now.setHours(0, 0, 0, 0);
+    const year = now.getFullYear();
+    const start = new Date(year, 0, 1);
+    const end = new Date(year, 11, 31);
+    
+    // Exact safe day calculation
+    const msPerDay = 86400000;
+    const total = 365 + (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 1 : 0);
+    const entriesArr = dataString.padEnd(total, '0').split('');
 
-    // Grid Calc
-    const sidePadding = 40;
-    const availableWidth = width - (sidePadding * 2);
-    const dotSize = Math.floor(availableWidth / (52 + 51 * 0.4));
-    const gap = Math.floor(dotSize * 0.4);
+    const scale = width / 393;
+    const px = (v: number) => v * scale;
 
-    const colors: Record<number, string> = {
-      0: '#161b22', 
-      1: '#39d353', 
-      2: '#26a641', 
-      3: '#006d32',
+    // Dark theme token mapping from globals.css
+    const colors = {
+      bg: 'linear-gradient(to bottom, #0d0d0d, #000000)',
+      card: 'linear-gradient(to bottom, rgba(31, 31, 31, 0.8), rgba(26, 26, 26, 0.8))',
+      border: 'rgba(255, 255, 255, 0.1)',
+      primary: '#a0a0a0',
+      primaryForeground: '#000000',
+      muted: '#333333',
+      mutedFuture: 'rgba(51, 51, 51, 0.5)',
+      innerEmpty: 'rgba(250, 250, 250, 0.2)',
     };
 
-    console.log(`Generating wallpaper: ${width}x${height}`);
+    // Pre-calculate 14 columns grid rows
+    const cols = 14;
+    const rows = [];
+    for (let i = 0; i < total; i += cols) {
+      rows.push(Array.from({ length: Math.min(cols, total - i) }).map((_, j) => i + j));
+    }
+
+    // Exact dot calculations
+    const gap = px(4);
+    const padding = px(16);
+    const cardContentWidth = (width * 0.85) - (padding * 2);
+    const dotSize = Math.floor((cardContentWidth - (gap * (cols - 1))) / cols);
+    const innerDotFilled = dotSize * 0.25;
+    const innerDotEmpty = dotSize * 0.18;
 
     return new ImageResponse(
       (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: `${width}px`,
-            height: `${height}px`,
-            backgroundColor: '#0d1117',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-          }}
-        >
-          {/* Debug Overlays */}
-          {showPreview && (
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: `${top}px`, backgroundColor: 'rgba(255,0,0,0.1)', borderBottom: '1px dashed red', display: 'flex', color: 'red', padding: '10px' }}>Clock Zone</div>
-          )}
-          {showPreview && (
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: `${bottom}px`, backgroundColor: 'rgba(255,0,0,0.1)', borderTop: '1px dashed red', display: 'flex', color: 'red', padding: '10px', alignItems: 'flex-end' }}>Dock Zone</div>
-          )}
+        <div style={{ display: 'flex', flexDirection: 'column', width, height, background: colors.bg, alignItems: 'center', fontFamily: '"Geist Mono"' }}>
+          {/* Top Safe Space */}
+          <div style={{ height: `${topSafe}px`, width: '100%' }} />
 
-          {/* Spacer Top */}
-          <div style={{ height: `${top}px`, width: '100%' }} />
+          {/* Centered Content */}
+          <div style={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '85%' }}>
+            
+            {/* Grid Card Only */}
+            <div style={{ display: 'flex', flexDirection: 'column', background: colors.card, border: `${px(1)}px solid ${colors.border}`, borderRadius: px(24), padding: padding, width: '100%' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: gap }}>
+                {rows.map((rowArr, rIdx) => (
+                  <div key={rIdx} style={{ display: 'flex', flexDirection: 'row', gap: gap }}>
+                    {rowArr.map((dayIdx) => {
+                      const dayDate = new Date(start.getTime() + dayIdx * msPerDay);
+                      const isToday = dayDate.getTime() === now.getTime();
+                      const isPast = dayDate < now;
+                      const hasEntry = entriesArr[dayIdx] === '1';
 
-          {/* Grid Container */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', padding: `0 ${sidePadding}px` }}>
-            <div style={{ display: 'flex', gap: `${gap}px` }}>
-              {weeks.map((week, wi) => (
-                <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: `${gap}px` }}>
-                  {week.map((level, di) => (
-                    <div
-                      key={di}
-                      style={{
-                        width: `${dotSize}px`,
-                        height: `${dotSize}px`,
-                        backgroundColor: colors[level] || colors[0],
-                        borderRadius: `${Math.max(2, Math.floor(dotSize * 0.22))}px`,
-                      }}
-                    />
-                  ))}
-                </div>
-              ))}
+                      // Determine colors based on app logic
+                      let outerBg = isPast || isToday ? colors.muted : colors.mutedFuture;
+                      if (hasEntry) outerBg = colors.primary;
+                      
+                      const innerBg = hasEntry ? colors.primaryForeground : colors.innerEmpty;
+                      const innerSize = hasEntry ? innerDotFilled : innerDotEmpty;
+
+                      return (
+                        <div key={dayIdx} style={{
+                          width: `${dotSize}px`,
+                          height: `${dotSize}px`,
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: outerBg,
+                          border: isToday ? `${px(1.5)}px solid ${colors.primary}` : 'none',
+                        }}>
+                          <div style={{ 
+                            width: `${innerSize}px`, 
+                            height: `${innerSize}px`, 
+                            borderRadius: '50%', 
+                            backgroundColor: innerBg 
+                          }} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
             </div>
+
           </div>
 
-          {/* Spacer Bottom */}
-          <div style={{ height: `${bottom}px`, width: '100%' }} />
+          {/* Bottom Safe Space */}
+          <div style={{ height: `${bottomSafe}px`, width: '100%' }} />
         </div>
       ),
-      { width, height }
+      { 
+        width, 
+        height,
+        fonts: [
+          { name: 'Geist Mono', data: geistMono300, weight: 300, style: 'normal' },
+          { name: 'Geist Mono', data: geistMono400, weight: 400, style: 'normal' },
+          { name: 'Geist Mono', data: geistMono500, weight: 500, style: 'normal' },
+        ],
+      }
     );
   } catch (e) {
-    return new Response('Failed to generate image', { status: 500 });
+    return new Response(`Render Error: ${e instanceof Error ? e.message : String(e)}`, { status: 500 });
   }
 }
+
+
+
+
+
