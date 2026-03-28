@@ -96,12 +96,14 @@ export default function Home() {
           <DotGridCalendar entryMap={entryMap} onDayClick={handleDayClick} loading={loading} />
 
           <div className="rounded-3xl bg-gradient-to-b from-accent to-card border border-border/50 p-3 backdrop-blur-md flex flex-wrap gap-2">
-            <button
-              onClick={handleDownloadWallpaper}
-              className="flex-1 min-w-[140px] px-4 py-2 rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium transition-all duration-200"
+            <a
+              href="https://www.icloud.com/shortcuts/71c20c82bd854b1b8d1edaa3fd7a6ecd"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 min-w-[140px] px-4 py-2 rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium transition-all duration-200 text-center"
             >
-              download wallpaper
-            </button>
+              use iOS wallpaper
+            </a>
             <button
               onClick={() => downloadExport()}
               className="flex-1 px-4 py-2 rounded-2xl bg-muted hover:bg-muted/80 text-foreground text-sm font-medium transition-all duration-200"

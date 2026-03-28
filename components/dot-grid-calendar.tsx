@@ -60,7 +60,7 @@ export default function DotGridCalendar({ entryMap, onDayClick, loading }: DotGr
           <div
             className="grid gap-1"
             style={{
-              gridTemplateColumns: "repeat(14, 1fr)",
+              gridTemplateColumns: "repeat(16, 1fr)",
               gridAutoRows: "auto",
             }}
           >
@@ -85,21 +85,19 @@ export default function DotGridCalendar({ entryMap, onDayClick, loading }: DotGr
                     w-full aspect-square rounded-full
                     flex items-center justify-center relative
                     ${isToday ? "ring-1 ring-primary" : ""}
-                    ${
-                      hasEntry
-                        ? "bg-primary text-primary-foreground shadow-sm hover:shadow-md hover:scale-110 cursor-pointer"
-                        : isPastOrToday
-                          ? "bg-muted hover:bg-muted/80 text-muted-foreground hover:scale-110 cursor-pointer"
-                          : "bg-muted/50 text-muted-foreground/40 cursor-default opacity-50"
+                    ${hasEntry
+                      ? "bg-primary text-primary-foreground shadow-sm hover:shadow-md hover:scale-110 cursor-pointer"
+                      : isPastOrToday
+                        ? "bg-muted hover:bg-muted/80 text-muted-foreground hover:scale-110 cursor-pointer"
+                        : "bg-muted/50 text-muted-foreground/40 cursor-default opacity-50"
                     }
                   `}
                   title={`${format(day, "MMM d, yyyy")}`}
                 >
                   {/* Dot visualization */}
                   <div
-                    className={`w-1 h-1 rounded-full ${
-                      hasEntry ? "bg-primary-foreground scale-100" : "bg-foreground/20 scale-75"
-                    }`}
+                    className={`w-1 h-1 rounded-full ${hasEntry ? "bg-primary-foreground scale-100" : "bg-foreground/20 scale-75"
+                      }`}
                   ></div>
                 </button>
               )
