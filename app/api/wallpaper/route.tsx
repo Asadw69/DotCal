@@ -35,7 +35,7 @@ export async function GET(request: Request) {
     const pct = Math.round((entryCount / total) * 100);
 
     // ─── iOS Lockscreen safe zones (percentage-based) ─────────────────────
-    const topSafe = Math.round(H * 0.23);   // clock + date + status bar
+    const topSafe = Math.round(H * 0.24);   // clock + date + status bar
     const bottomSafe = Math.round(H * 0.10);   // flashlight / camera / home-bar
     const usableH = H - topSafe - bottomSafe;
 
